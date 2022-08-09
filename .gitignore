@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+__pycache__
+**/__pycache__/**
+
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
+
+**/media/**
+**/django_cache/**
+
+db.sqlite3
+
+
+venv
