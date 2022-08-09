@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth import login
+from django.db.models import F,Sum
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
@@ -126,3 +127,26 @@ class ActivityRoutineView(views.APIView):
 
         return Response(serializer.data)
     
+class MyCaloriesStatus(views.APIView):
+    
+    def get(self,request,*args,**kwargs):
+        activity_routine = ActivityRoutine.objects.filter(user=request.user)
+        food_routine = FoodRoutine.objects.filter(user=request.user)
+        
+        if request.GET.get('date_from') and request.GET.get('date_to'):
+            activity_routine = activity_routine.filter(
+                created_on__range=[request.GET.get('date_from'),request.GET.get('date_to')]
+            )
+            food_routine = food_routine.filter(
+                created_on__range=[request.GET.get('date_from'),request.GET.get('date_to')]
+            )
+        
+
+        response = {
+            'burn_out':activity_routine.aggregate(Sum('activity__calorie_burnout'))['activity__calorie_burnout__sum'],
+            'consumed':food_routine.aggregate(Sum('food_item__caloire'))['food_item__caloire__sum'],
+            'activity_routine':ActivityRoutineListSerializer(activity_routine,many=True).data,
+            'food_routine':FoodRoutienListSerializer(food_routine,many=True).data,
+        }
+        
+        return Response(response)

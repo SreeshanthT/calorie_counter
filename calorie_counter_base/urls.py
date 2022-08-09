@@ -16,5 +16,6 @@ urlpatterns = [
     path('login/',views.LoginView.as_view(),name='login'),
     path('food-routine-<str:pk>/',views.FoodRoutienView.as_view(),name='food-routine'),
     path('activity-routine-<str:pk>/',views.ActivityRoutineView.as_view(),name='activity-routine'),
+    path('my-calorie-status/',views.MyCaloriesStatus.as_view(),name='my-calorie-status'),
     
 ]
