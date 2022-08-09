@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'calorie_counter_base',
     
     'rest_framework',
+    'taggit',
 ]
 
 MIDDLEWARE = [

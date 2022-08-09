@@ -9,9 +9,13 @@ from rest_framework import generics
 from rest_framework import views
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import FoodItemSerializer, RegisterSerializer,LoginSerializer
 
-from .models import FoodItems
+from calorie_counter_base.utils import get_object_or_none
+from .serializers import FoodItemSerializer, RegisterSerializer,LoginSerializer,\
+    FoodRoutienCreateSerializer,ActivityRoutineCreateSerializer,ActivitySerializer,ActivityRoutineListSerializer,\
+    FoodRoutienListSerializer
+
+from .models import FoodItems,FoodRoutine,ActivityRoutine,Activities
 # Create your views here.
 
 def index(request):
@@ -40,3 +44,85 @@ class FoodItemViewSet(viewsets.ModelViewSet):
     queryset = FoodItems.objects.all()
     serializer_class = FoodItemSerializer
     permission_classes = [permissions.IsAuthenticated] 
+class ActivityViewSet(viewsets.ModelViewSet):
+    queryset = Activities.objects.all()
+    serializer_class = ActivitySerializer
+    permission_classes = [permissions.IsAuthenticated] 
+    
+    
+    
+class FoodRoutienView(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+    
+    def get(self, request, *args, **kwargs):
+        food_routine = get_object_or_none(FoodRoutine,id=kwargs.get('pk'))
+        serializer = FoodRoutienListSerializer(
+            instance=food_routine
+        )
+        
+        if food_routine is None:
+            qs = FoodRoutine.objects.filter(user=request.user)
+            
+            if request.GET.get('month'):
+                qs = qs.filter(created_on__month=request.GET.get('month'))
+            if request.GET.get('day'):
+                qs = qs.filter(created_on__day=request.GET.get('day'))
+            if request.GET.get('year'):
+                qs = qs.filter(created_on__year=request.GET.get('year'))
+                
+                
+            serializer = FoodRoutienListSerializer(qs,many=True)
+        return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+    
+    def post(self, request, *args, **kwargs):
+        food_routine = get_object_or_none(FoodRoutine,id=kwargs.get('pk'))
+        
+        serializer = FoodRoutienCreateSerializer(
+            data=self.request.data,
+            instance=food_routine
+        )
+        if serializer.is_valid(raise_exception=True):
+            obj = serializer.save()
+            obj.user = request.user
+            obj.save()
+
+        return Response(serializer.data)
+    
+class ActivityRoutineView(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+    
+    def get(self, request, *args, **kwargs):
+        activity_routine = get_object_or_none(ActivityRoutine,id=kwargs.get('pk'))
+        serializer = ActivityRoutineListSerializer(instance=activity_routine)
+        
+        if activity_routine is None:
+            
+            qs = ActivityRoutine.objects.filter(user = request.user)
+            
+            if request.GET.get('month'):
+                qs = qs.filter(created_on__month=request.GET.get('month'))
+            if request.GET.get('day'):
+                qs = qs.filter(created_on__day=request.GET.get('day'))
+            if request.GET.get('year'):
+                qs = qs.filter(created_on__year=request.GET.get('year'))
+            
+            serializer = ActivityRoutineListSerializer(qs,many=True)
+        
+        return Response(serializer.data)
+    
+    def post(self, request, *args, **kwargs):
+        activity_routine = get_object_or_none(ActivityRoutine,id=kwargs.get('pk'))
+        
+        serializer = ActivityRoutineCreateSerializer(
+            data=self.request.data,
+            instance=activity_routine
+        )
+        if serializer.is_valid(raise_exception=True):
+            obj = serializer.save()
+            obj.user = request.user
+            obj.save()
+            serializer = ActivityRoutineListSerializer(obj)
+            
+
+        return Response(serializer.data)
+    

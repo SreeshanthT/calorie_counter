@@ -1,10 +1,11 @@
+from pyexpat import model
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
 
-from calorie_counter_base.models import FoodItems
+from calorie_counter_base.models import FoodItems,FoodRoutine,ActivityRoutine,Activities
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -71,7 +72,56 @@ class LoginSerializer(serializers.Serializer):
         return attrs
     
     
-class FoodItemSerializer(serializers.HyperlinkedModelSerializer):
+class FoodItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = FoodItems
-        fields = ['url', 'food','caloire'] 
+        fields = ['pk','food','caloire','status'] 
+        
+        
+        
+class ActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activities
+        fields = ['pk','activity','calorie_burnout','status'] 
+         
+        
+class FoodRoutienListSerializer(serializers.ModelSerializer):
+    food_item = FoodItemSerializer()
+    class Meta:
+        model = FoodRoutine
+        fields = ['food_item','created_on']
+         
+class FoodRoutienCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FoodRoutine
+        fields = ['food_item','created_on']
+        
+    def validate(self, data):
+        food_item = data['food_item']
+        if food_item:
+            if food_item.active == 1:
+                return data
+            else:
+                raise serializers.ValidationError("Please select active food items")
+        return data
+        
+        
+class ActivityRoutineListSerializer(serializers.ModelSerializer):
+    activity = ActivitySerializer()
+    class Meta:
+        model = ActivityRoutine
+        fields = ['pk','activity','created_on','activity_status','start_time','end_time','activity_time']
+        
+class ActivityRoutineCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityRoutine
+        fields = ['activity','created_on','status']
+        
+    def validate(self, data):
+        activity = data['activity']
+        if activity:
+            if activity.active == 1:
+                return data
+            else:
+                raise serializers.ValidationError("Please select active food items")
+        return data
