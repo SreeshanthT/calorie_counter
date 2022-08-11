@@ -12,6 +12,8 @@ from rest_framework import generics
 from rest_framework import views
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+
 
 from calorie_counter_base.utils import get_object_or_none
 from .serializers import FoodItemSerializer, RegisterSerializer,LoginSerializer,\
@@ -22,7 +24,7 @@ from .models import FoodItems,FoodRoutine,ActivityRoutine,Activities
 # Create your views here.
 
 def index(request):
-    return HttpResponse('Done')
+    return render(request,'index.html',locals())
     
 
   
@@ -55,7 +57,8 @@ class ActivityViewSet(viewsets.ModelViewSet):
     
     
 class FoodRoutienView(views.APIView):
-    permission_classes = (permissions.AllowAny,)
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
     
     def get(self, request, *args, **kwargs):
         food_routine = get_object_or_none(FoodRoutine,id=kwargs.get('pk'))
@@ -92,7 +95,9 @@ class FoodRoutienView(views.APIView):
         return Response(serializer.data)
     
 class ActivityRoutineView(views.APIView):
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
     
     def get(self, request, *args, **kwargs):
         activity_routine = get_object_or_none(ActivityRoutine,id=kwargs.get('pk'))

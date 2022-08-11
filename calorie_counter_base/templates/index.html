@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Counter</title>
+</head>
+<body>
+    <ol>
+        <li>
+            <a href="{% url 'register' %}">register</a>
+        </li>
+        <li>
+            <a href="{% url 'login' %}">login</a>
+        </li>
+        <li>
+            <a href="{% url 'food-routine' 'add' %}">food routine</a>
+        </li>
+        <li>
+            <a href="{% url 'activity-routine' 'add' %}">activity routine</a>
+        </li>
+        <li>
+            <a href="{% url 'my-calorie-status' %}">my-calorie-status</a>
+        </li>
+        <li>
+            <a href="activity/">activity routine</a>
+        </li>
+        <li>
+            <a href="food-item/">my-calorie-status</a>
+        </li>
+    </ol>
+</body>
+</html>
