@@ -1,3 +1,5 @@
+from datetime import timedelta
+import datetime
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth import login
@@ -139,6 +141,32 @@ class MyCaloriesStatus(views.APIView):
             )
             food_routine = food_routine.filter(
                 created_on__range=[request.GET.get('date_from'),request.GET.get('date_to')]
+            )
+            
+        if 'last_week' in request.GET:
+            one_week_ago = datetime.datetime.today() - datetime.timedelta(days=7)
+            
+            activity_routine = activity_routine.filter(
+                created_on__gte=one_week_ago
+            )
+            food_routine = food_routine.filter(
+                created_on__gte=one_week_ago
+            )
+            
+        if request.GET.get('month'):
+            activity_routine = activity_routine.filter(
+                created_on__month=request.GET.get('month')
+            )
+            food_routine = food_routine.filter(
+                created_on__month=request.GET.get('month')
+            )
+            
+        if request.GET.get('year'):
+            activity_routine = activity_routine.filter(
+                created_on__year=request.GET.get('year')
+            )
+            food_routine = food_routine.filter(
+                created_on__year=request.GET.get('year')
             )
         
 
